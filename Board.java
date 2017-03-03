@@ -20,7 +20,7 @@ public class Board extends JPanel{
                               {0,0,0,0,0,0,0,0}};
    
    public Board(){
-      //super(new 
+      //super(new)
    }
    public void paint(Graphics g){
    
