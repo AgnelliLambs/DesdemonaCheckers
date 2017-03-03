@@ -3,7 +3,7 @@ import java.awt.event.*;
 
 public class Drawing extends JFrame implements MouseListener{
    Drawer board; 
-   private boolean whiteTurn = true;
+   private boolean whiteTurn = false;
    public static void main(String args[]){
       new Drawing();
    }
@@ -20,15 +20,21 @@ public class Drawing extends JFrame implements MouseListener{
    }
    @Override
    public void mouseClicked(MouseEvent e){
+   
       int x = e.getX()/Drawer.SQUARE_SIZE;
       int y = e.getY()/Drawer.SQUARE_SIZE;
+      
       if(whiteTurn){
-         board.addPiece(x,y,board.WHITE);
-         flipPeices(x,y,board.WHITE);
+         if(isLegalMove(x,y)){
+            board.addPiece(x,y,board.WHITE);
+            flipPieces(x,y,board.WHITE);
+         }
       }
       else{
-         board.addPiece(x,y,board.BLACK);
-         flipPeices(x,y,board.BLACK);
+         if(isLegalMove(x,y)){
+            board.addPiece(x,y,board.BLACK);
+            flipPieces(x,y,board.BLACK);
+         }
       }
       board.repaint();
       System.out.println("x: "+x+",y: "+y);
@@ -44,11 +50,15 @@ public class Drawing extends JFrame implements MouseListener{
    @Override
    public void mousePressed(MouseEvent e){}
    
-   public void flipPeices(int x1,int y1,int col){
+   public void flipPieces(int x1,int y1,int col){
    //<!-- NOTE : If board.pieces[var][var] == 0 break, set x and y to -1 -->
    //check left
       int firstLeft = -1;
       for(int i=x1-1;i>=0;i--){//find the first board of similar color to the left of this board
+         if(board.pieces[i][y1] == Drawer.EMPTY){
+            firstLeft=-1;
+            break;
+         }
          if(board.pieces[i][y1] == col){
             firstLeft=i;
             break;
@@ -64,6 +74,9 @@ public class Drawing extends JFrame implements MouseListener{
    //check right
       int firstRight = -1;
       for(int i=x1+1;i<8;i++){//find the first board of similar color to the right of this board
+         if(board.pieces[i][y1] == Drawer.EMPTY){
+            firstRight=-1;
+         }
          if(board.pieces[i][y1] == col){
             firstRight=i;
             break;
@@ -81,6 +94,9 @@ public class Drawing extends JFrame implements MouseListener{
    
       int firstUp = -1;
       for(int i=y1-1;i>=0;i--){//find the first board of similar color to above 
+         if(board.pieces[x1][i] == Drawer.EMPTY){
+            firstUp=-1;
+         }
          if(board.pieces[x1][i] == col){
             firstUp=i;
             break;
@@ -98,6 +114,9 @@ public class Drawing extends JFrame implements MouseListener{
    
       int firstDown = -1;
       for(int i=y1+1;i<8;i++){//find the first board of similar color to the below the clicked location
+         if(board.pieces[x1][i] == Drawer.EMPTY){
+            firstDown=-1;
+         }
          if(board.pieces[x1][i] == col){
             firstDown=i;
             break;
@@ -121,6 +140,11 @@ public class Drawing extends JFrame implements MouseListener{
       firstUpLeftY--;
       
       while(firstUpLeftX > -1 && firstUpLeftY>-1){
+         if(board.pieces[firstUpLeftX][firstUpLeftY] == Drawer.EMPTY){ 
+            firstUpLeftX=-1;
+            firstUpLeftY=-1;
+            break;
+         }
          
          if(board.pieces[firstUpLeftX][firstUpLeftY] == col){ //find the first piece up and to the left
             break;
@@ -153,6 +177,12 @@ public class Drawing extends JFrame implements MouseListener{
       
       //find the first piece
       while(firstUpRightX < 8 && firstUpRightY>-1){
+         
+         if(board.pieces[firstUpRightX][firstUpRightY] == Drawer.EMPTY){
+            firstUpRightX = -1;
+            firstUpRightY = -1;
+            break;
+         }
          
          if(board.pieces[firstUpRightX][firstUpRightY] == col){
             break;
@@ -188,6 +218,12 @@ public class Drawing extends JFrame implements MouseListener{
       //find the first piece
       while(downLeftX >-1 && downLeftY<8){
          
+         if(board.pieces[downLeftX][downLeftY] == Drawer.EMPTY){
+            downLeftX = -1;
+            downLeftY = -1;
+            break;
+         }
+         
          if(board.pieces[downLeftX][downLeftY] == col){
             break;
          }
@@ -210,8 +246,8 @@ public class Drawing extends JFrame implements MouseListener{
             downLeftY--;
          }
       }
-
-
+   
+   
    //check downright
       int downRightX = x1;
       int downRightY = y1;
@@ -221,6 +257,12 @@ public class Drawing extends JFrame implements MouseListener{
       
       //find the first piece
       while(downRightX <8 && downRightY<8){
+         
+         if(board.pieces[downRightX][downRightY] == Drawer.EMPTY){
+            downRightX = -1;
+            downRightY = -1;
+            break;
+         }
          
          if(board.pieces[downRightX][downRightY] == col){
             break;
@@ -245,5 +287,85 @@ public class Drawing extends JFrame implements MouseListener{
          }
       }
    }
-
+   /**
+    * Returns whether or not the move move is legal
+    * @params int x - the x coordinate of the move
+    * @params int y - the y coodinate of the move
+    * @return boolean - true if the move is legal, otherwise, false
+    */
+    
+   public boolean isLegalMove(int x,int y){
+      if(board.pieces[x][y]!=0){
+         System.out.println("1");
+         return false;
+      }
+      else{
+      //left
+         try{
+            if(board.pieces[x-1][y]!=0){
+               System.out.println("2");
+               return true;
+            }
+         }
+         catch(ArrayIndexOutOfBoundsException aioobe){}
+         //right
+         try{
+            if(board.pieces[x+1][y]!=0){
+               System.out.println("3");
+               return true;
+            }
+         }
+         catch(ArrayIndexOutOfBoundsException aioobe){}
+         //up
+         try{
+            if(board.pieces[x][y-1]!=0){
+               System.out.println("4");
+               return true;
+            }
+         }
+         catch(ArrayIndexOutOfBoundsException aioobe){}
+         //down
+         try{
+            if(board.pieces[x][y+1]!=0){
+               System.out.println("5");
+               return true;
+            }
+         }
+         catch(ArrayIndexOutOfBoundsException aioobe){}
+         //upleft
+         try{
+            if(board.pieces[x-1][y-1]!=0){
+               System.out.println("6");
+               return true;
+            }
+         }
+         catch(ArrayIndexOutOfBoundsException aioobe){}
+         //upright
+         try{
+            if(board.pieces[x+1][y-1]!=0){
+               System.out.println("7");
+               return true;
+            }
+         }
+         catch(ArrayIndexOutOfBoundsException aioobe){}
+         //downleft
+         try{
+            if(board.pieces[x-1][y+1]!=0){
+               System.out.println("8");
+               return true;
+            }
+         }
+         catch(ArrayIndexOutOfBoundsException aioobe){}
+         //downright
+         try{
+            if(board.pieces[x+1][y+1]!=0){
+               System.out.println("9");
+               return true;
+            }
+         }
+         catch(ArrayIndexOutOfBoundsException aioobe){}
+      }
+      System.out.println("10");
+      return false;
+   }
 }

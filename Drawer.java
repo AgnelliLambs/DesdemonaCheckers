@@ -5,6 +5,8 @@ import javax.swing.JPanel;
 
 public class Drawer extends JPanel{
    public static final int SQUARE_SIZE = 95;
+   
+   public static final int EMPTY = 0;
    public static final int BLACK = 1;
    public static final int WHITE = 2;
    
@@ -21,6 +23,7 @@ public class Drawer extends JPanel{
       //super(new 
    }
    public void paint(Graphics g){
+   
       for(int y=0;y<8;y++){
          for(int x=0;x<8;x++){
             g.setColor(Color.BLACK);
@@ -74,3 +77,24 @@ public class Drawer extends JPanel{
       }
    }
 }
+
+/**
+Check if the game is over
+
+for(int x=0;x<8;x++){
+      for(int y=0;y<8;y++){
+         if(isLegalMove(x,y,DRAWER.WHITE)){
+            return true;
+         }
+      }
+    }
+    return false;
+    
+    for(int x=0;x<8;x++){
+      for(int y=0;y<8;y++){
+         isLegalMove(x,y,DRAWER.BLACK);
+      }
+    }
+
+
+*/
