@@ -3,7 +3,7 @@ import javax.swing.JFrame;
 import javax.swing.JPanel;
 
 
-public class Drawer extends JPanel{
+public class Board extends JPanel{
    public static final int SQUARE_SIZE = 95;
    
    public static final int EMPTY = 0;
@@ -19,7 +19,7 @@ public class Drawer extends JPanel{
                               {0,0,0,0,0,0,0,0},
                               {0,0,0,0,0,0,0,0}};
    
-   public Drawer(){
+   public Board(){
       //super(new 
    }
    public void paint(Graphics g){

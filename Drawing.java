@@ -2,7 +2,7 @@ import javax.swing.*;
 import java.awt.event.*;
 
 public class Drawing extends JFrame implements MouseListener{
-   Drawer board; 
+   Board board; 
    private boolean whiteTurn = false;
    public static void main(String args[]){
       new Drawing();
@@ -11,7 +11,7 @@ public class Drawing extends JFrame implements MouseListener{
    
       
       this.addMouseListener(this);
-      board  = new Drawer();
+      board  = new Board();
       this.add(board);
       board.repaint();
       this.setSize(800,800);
@@ -21,8 +21,8 @@ public class Drawing extends JFrame implements MouseListener{
    @Override
    public void mouseClicked(MouseEvent e){
    
-      int x = e.getX()/Drawer.SQUARE_SIZE;
-      int y = e.getY()/Drawer.SQUARE_SIZE;
+      int x = e.getX()/Board.SQUARE_SIZE;
+      int y = e.getY()/Board.SQUARE_SIZE;
       
       if(whiteTurn){
          if(isLegalMove(x,y)){
@@ -55,7 +55,7 @@ public class Drawing extends JFrame implements MouseListener{
    //check left
       int firstLeft = -1;
       for(int i=x1-1;i>=0;i--){//find the first board of similar color to the left of this board
-         if(board.pieces[i][y1] == Drawer.EMPTY){
+         if(board.pieces[i][y1] == Board.EMPTY){
             firstLeft=-1;
             break;
          }
@@ -74,7 +74,7 @@ public class Drawing extends JFrame implements MouseListener{
    //check right
       int firstRight = -1;
       for(int i=x1+1;i<8;i++){//find the first board of similar color to the right of this board
-         if(board.pieces[i][y1] == Drawer.EMPTY){
+         if(board.pieces[i][y1] == Board.EMPTY){
             firstRight=-1;
          }
          if(board.pieces[i][y1] == col){
@@ -94,7 +94,7 @@ public class Drawing extends JFrame implements MouseListener{
    
       int firstUp = -1;
       for(int i=y1-1;i>=0;i--){//find the first board of similar color to above 
-         if(board.pieces[x1][i] == Drawer.EMPTY){
+         if(board.pieces[x1][i] == Board.EMPTY){
             firstUp=-1;
          }
          if(board.pieces[x1][i] == col){
@@ -114,7 +114,7 @@ public class Drawing extends JFrame implements MouseListener{
    
       int firstDown = -1;
       for(int i=y1+1;i<8;i++){//find the first board of similar color to the below the clicked location
-         if(board.pieces[x1][i] == Drawer.EMPTY){
+         if(board.pieces[x1][i] == Board.EMPTY){
             firstDown=-1;
          }
          if(board.pieces[x1][i] == col){
@@ -140,7 +140,7 @@ public class Drawing extends JFrame implements MouseListener{
       firstUpLeftY--;
       
       while(firstUpLeftX > -1 && firstUpLeftY>-1){
-         if(board.pieces[firstUpLeftX][firstUpLeftY] == Drawer.EMPTY){ 
+         if(board.pieces[firstUpLeftX][firstUpLeftY] == Board.EMPTY){ 
             firstUpLeftX=-1;
             firstUpLeftY=-1;
             break;
@@ -178,7 +178,7 @@ public class Drawing extends JFrame implements MouseListener{
       //find the first piece
       while(firstUpRightX < 8 && firstUpRightY>-1){
          
-         if(board.pieces[firstUpRightX][firstUpRightY] == Drawer.EMPTY){
+         if(board.pieces[firstUpRightX][firstUpRightY] == Board.EMPTY){
             firstUpRightX = -1;
             firstUpRightY = -1;
             break;
@@ -218,7 +218,7 @@ public class Drawing extends JFrame implements MouseListener{
       //find the first piece
       while(downLeftX >-1 && downLeftY<8){
          
-         if(board.pieces[downLeftX][downLeftY] == Drawer.EMPTY){
+         if(board.pieces[downLeftX][downLeftY] == Board.EMPTY){
             downLeftX = -1;
             downLeftY = -1;
             break;
@@ -258,7 +258,7 @@ public class Drawing extends JFrame implements MouseListener{
       //find the first piece
       while(downRightX <8 && downRightY<8){
          
-         if(board.pieces[downRightX][downRightY] == Drawer.EMPTY){
+         if(board.pieces[downRightX][downRightY] == Board.EMPTY){
             downRightX = -1;
             downRightY = -1;
             break;
