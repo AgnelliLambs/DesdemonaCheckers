@@ -3,13 +3,15 @@ import java.awt.event.*;
 
 public class Drawing extends JFrame implements MouseListener{
    Board board; 
+   public boolean gameOver = false;
    private boolean whiteTurn = false;
+   public int whiteTimeLeft = 1800000;
+   public int blackTimeLeft = 1800000;
+   
    public static void main(String args[]){
       new Drawing();
    }
    public Drawing(){
-   
-      
       this.addMouseListener(this);
       board  = new Board();
       this.add(board);
@@ -21,8 +23,8 @@ public class Drawing extends JFrame implements MouseListener{
    @Override
    public void mouseClicked(MouseEvent e){
    
-      int x = e.getX()/Board.SQUARE_SIZE;
-      int y = e.getY()/Board.SQUARE_SIZE;
+      int x = e.getX()/Board.SQUARE_SIZE;  // this is where you should edit pieces being dropped
+      int y = e.getY()/Board.SQUARE_SIZE;  //   print stuff out and test
       
       if(whiteTurn){
          if(isLegalMove(x,y)){
@@ -38,7 +40,9 @@ public class Drawing extends JFrame implements MouseListener{
       }
       board.repaint();
       System.out.println("x: "+x+",y: "+y);
-      
+      if(gameOver == true){
+         checkWinner();
+      }
       whiteTurn=!whiteTurn;
    }
    @Override
@@ -46,7 +50,37 @@ public class Drawing extends JFrame implements MouseListener{
    @Override
    public void mouseEntered(MouseEvent e){}
    @Override
-   public void  mouseReleased(MouseEvent e){}
+   public void  mouseReleased(MouseEvent e){
+      if(whiteTurn){
+         ActionListener taskPerformer = 
+            new ActionListener() {
+               public void actionPerformed(ActionEvent evt) {
+                  whiteTimeLeft--;
+                  if(whiteTimeLeft<=0){
+                     gameEnding();
+                  }
+               }
+            };
+         Timer t1 = new Timer(1, taskPerformer);
+         t1.setRepeats(true);
+         t1.start();
+      }
+      else{
+         ActionListener taskPerformer = 
+            new ActionListener() {
+               public void actionPerformed(ActionEvent evt) {
+                  whiteTimeLeft--;
+                  if(blackTimeLeft<=0){
+                     gameEnding();
+                  }
+               }
+            };
+         Timer t1 = new Timer(1, taskPerformer);
+         t1.setRepeats(true);
+         t1.start();
+      }
+      
+   }
    @Override
    public void mousePressed(MouseEvent e){}
    
@@ -367,5 +401,42 @@ public class Drawing extends JFrame implements MouseListener{
       }
       System.out.println("10");
       return false;
+   }
+   /**
+    * sets the game to its almost over state, one turn remains
+    */
+   public void gameEnding(){
+      whiteTimeLeft = 0;
+      blackTimeLeft = 0;
+      
+      gameOver = true;
+   }
+   /**
+    * Checks who wins the game
+    */
+   public void checkWinner(){
+      int blackPieces = 0;
+      int whitePieces = 0;
+      //cycle through the array to see who has more pices
+      for(int x=0;x<8;x++){
+         for(int y=0;y<8;y++){
+            if(board.pieces[x][y] == Board.BLACK)
+               blackPieces++;
+            else if(board.pieces[x][y] == Board.BLACK)
+               whitePieces++;
+               
+         }
+      }
+      
+      //display winner
+      if(whitePieces>blackPieces){
+        JOptionPane.showMessageDialog(null,"White Wins!");
+      }
+      else if(whitePieces<blackPieces){
+        JOptionPane.showMessageDialog(null,"Black Wins!");
+      }
+      else if(whitePieces == blackPieces){
+        JOptionPane.showMessageDialog(null,"Its a Tie!");
+      }
    }
 }
