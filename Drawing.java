@@ -1,39 +1,73 @@
 import javax.swing.*;
 import java.awt.event.*;
+import java.io.*;
+import javax.sound.sampled.*;
+
 
 public class Drawing extends JFrame implements MouseListener{
+   
    Board board; 
    private boolean whiteTurn = false;
+   String moveSound = "moveSound.wav";
+   
    public static void main(String args[]){
       new Drawing();
    }
    public Drawing(){
    
-      
       this.addMouseListener(this);
       board  = new Board();
       this.add(board);
       board.repaint();
+      
       this.setSize(800,800);
       this.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
       this.setVisible(true);
+      
    }
    @Override
    public void mouseClicked(MouseEvent e){
    
       int x = e.getX()/Board.SQUARE_SIZE;
       int y = e.getY()/Board.SQUARE_SIZE;
+      Clip clip = null;
+      
+      try{ // Everything from here to catch statements is for the sound file
+         File soundFile = new File(moveSound);
+         AudioInputStream sound = AudioSystem.getAudioInputStream(soundFile);
+      
+         //Load the sound
+         DataLine.Info info = new DataLine.Info(Clip.class, sound.getFormat());
+         clip = (Clip)AudioSystem.getLine(info);
+         clip.open(sound);
+         
+      }
+      catch(IOException ioe){
+         ioe.printStackTrace();
+         System.out.println("Sound FX Error in mouseClicked");
+      }
+      catch(UnsupportedAudioFileException uafe){
+         System.out.println("Error: Audio file not supported.");
+      }
+      catch(LineUnavailableException lue){
+         lue.printStackTrace();
+      }
+      catch(NullPointerException npe){
+         System.out.println("Audio Not Found");
+      }// End of Sound stuffs
       
       if(whiteTurn){
          if(isLegalMove(x,y)){
             board.addPiece(x,y,board.WHITE);
-            flipPieces(x,y,board.WHITE);
+            flipPieces(x,y,board.WHITE); 
+            clip.start(); // Play the sound        
          }
       }
       else{
          if(isLegalMove(x,y)){
             board.addPiece(x,y,board.BLACK);
             flipPieces(x,y,board.BLACK);
+            clip.start(); // Play the sound
          }
       }
       board.repaint();
