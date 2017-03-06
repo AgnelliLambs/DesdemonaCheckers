@@ -1,48 +1,78 @@
 import javax.swing.*;
 import java.awt.event.*;
+import java.io.*;
+import javax.sound.sampled.*;
+
 
 public class Drawing extends JFrame implements MouseListener{
+   
    Board board; 
-   public boolean gameOver = false;
    private boolean whiteTurn = false;
-   public int whiteTimeLeft = 1800000;
-   public int blackTimeLeft = 1800000;
+   String moveSound = "moveSound.wav";
    
    public static void main(String args[]){
       new Drawing();
    }
    public Drawing(){
+   
       this.addMouseListener(this);
       board  = new Board();
       this.add(board);
       board.repaint();
+      
       this.setSize(800,800);
       this.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
       this.setVisible(true);
+      
    }
    @Override
    public void mouseClicked(MouseEvent e){
    
-      int x = e.getX()/Board.SQUARE_SIZE;  // this is where you should edit pieces being dropped
-      int y = e.getY()/Board.SQUARE_SIZE;  //   print stuff out and test
+      int x = e.getX()/Board.SQUARE_SIZE;
+      int y = e.getY()/Board.SQUARE_SIZE;
+      Clip clip = null;
+      
+      try{ // Everything from here to catch statements is for the sound file
+         File soundFile = new File(moveSound);
+         AudioInputStream sound = AudioSystem.getAudioInputStream(soundFile);
+      
+         //Load the sound
+         DataLine.Info info = new DataLine.Info(Clip.class, sound.getFormat());
+         clip = (Clip)AudioSystem.getLine(info);
+         clip.open(sound);
+         
+      }
+      catch(IOException ioe){
+         ioe.printStackTrace();
+         System.out.println("Sound FX Error in mouseClicked");
+      }
+      catch(UnsupportedAudioFileException uafe){
+         System.out.println("Error: Audio file not supported.");
+      }
+      catch(LineUnavailableException lue){
+         lue.printStackTrace();
+      }
+      catch(NullPointerException npe){
+         System.out.println("Audio Not Found");
+      }// End of Sound stuffs
       
       if(whiteTurn){
          if(isLegalMove(x,y)){
             board.addPiece(x,y,board.WHITE);
-            flipPieces(x,y,board.WHITE);
+            flipPieces(x,y,board.WHITE); 
+            clip.start(); // Play the sound        
          }
       }
       else{
          if(isLegalMove(x,y)){
             board.addPiece(x,y,board.BLACK);
             flipPieces(x,y,board.BLACK);
+            clip.start(); // Play the sound
          }
       }
       board.repaint();
       System.out.println("x: "+x+",y: "+y);
-      if(gameOver == true){
-         checkWinner();
-      }
+      
       whiteTurn=!whiteTurn;
    }
    @Override
@@ -50,37 +80,7 @@ public class Drawing extends JFrame implements MouseListener{
    @Override
    public void mouseEntered(MouseEvent e){}
    @Override
-   public void  mouseReleased(MouseEvent e){
-      if(whiteTurn){
-         ActionListener taskPerformer = 
-            new ActionListener() {
-               public void actionPerformed(ActionEvent evt) {
-                  whiteTimeLeft--;
-                  if(whiteTimeLeft<=0){
-                     gameEnding();
-                  }
-               }
-            };
-         Timer t1 = new Timer(1, taskPerformer);
-         t1.setRepeats(true);
-         t1.start();
-      }
-      else{
-         ActionListener taskPerformer = 
-            new ActionListener() {
-               public void actionPerformed(ActionEvent evt) {
-                  whiteTimeLeft--;
-                  if(blackTimeLeft<=0){
-                     gameEnding();
-                  }
-               }
-            };
-         Timer t1 = new Timer(1, taskPerformer);
-         t1.setRepeats(true);
-         t1.start();
-      }
-      
-   }
+   public void  mouseReleased(MouseEvent e){}
    @Override
    public void mousePressed(MouseEvent e){}
    
@@ -401,42 +401,5 @@ public class Drawing extends JFrame implements MouseListener{
       }
       System.out.println("10");
       return false;
-   }
-   /**
-    * sets the game to its almost over state, one turn remains
-    */
-   public void gameEnding(){
-      whiteTimeLeft = 0;
-      blackTimeLeft = 0;
-      
-      gameOver = true;
-   }
-   /**
-    * Checks who wins the game
-    */
-   public void checkWinner(){
-      int blackPieces = 0;
-      int whitePieces = 0;
-      //cycle through the array to see who has more pices
-      for(int x=0;x<8;x++){
-         for(int y=0;y<8;y++){
-            if(board.pieces[x][y] == Board.BLACK)
-               blackPieces++;
-            else if(board.pieces[x][y] == Board.BLACK)
-               whitePieces++;
-               
-         }
-      }
-      
-      //display winner
-      if(whitePieces>blackPieces){
-        JOptionPane.showMessageDialog(null,"White Wins!");
-      }
-      else if(whitePieces<blackPieces){
-        JOptionPane.showMessageDialog(null,"Black Wins!");
-      }
-      else if(whitePieces == blackPieces){
-        JOptionPane.showMessageDialog(null,"Its a Tie!");
-      }
    }
 }
